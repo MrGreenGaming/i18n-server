@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "module": "commonjs",
+    "outDir": "dist",
+    "removeComments": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2020",
+    "moduleResolution": "node",
+    "paths": {
+      // "@managers/*": [
+      //   "src/managers/*"
+      // ],
+      // "@classes/*": [
+      //   "src/classes/*"
+      // ],
+      // "@shared/*": [
+      //   "src/shared/*"
+      // ],
+      // "@server": [
+      //   "src/Server"
+      // ]
+    },
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "spec/**/*.ts"
+  ]
+}
