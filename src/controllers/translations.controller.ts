@@ -7,6 +7,11 @@ import { OK } from 'http-status-codes';
 
 @Controller('')
 export class TranslationsController {
+    @Get('')
+    private getAllProjects(req: Request, res: Response) {
+        res.status(OK).json(Translations.getAllProjects());
+    }
+
     @Get(':project')
     @Middleware(ProjectMiddleware)
     private async getProjectInfo(req: Request, res: Response) {
