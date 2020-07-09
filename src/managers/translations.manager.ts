@@ -110,7 +110,7 @@ class TranslationsManager extends BaseManager {
         const dir = await fs.readdir(`${Repo.path}/${dirPath}`);
         const languages: ILanguage[] = [];
         for (const language of dir) {
-            const match = language.match(/translation-(.{1,})\.json$/);
+            const match = language.match(/(.{1,})\.json$/);
             if (match && typeof match[0] === 'string' && typeof match[1] === 'string') {
                 languages.push({ name: match[1], file: match[0] });
             }
