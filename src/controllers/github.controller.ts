@@ -5,6 +5,7 @@ import GithubMiddleware from '../middlewares/github.middleware';
 import { GithubWebhookPushPayload, Extraction } from '../managers/extractions.manager';
 import errorMiddleware from '../middlewares/error.middleware';
 import { asyncWrapper } from '../shared/AsyncWrapper';
+import logger from '../shared/Logger';
 
 @Controller('github')
 @ClassWrapper(asyncWrapper)
@@ -12,8 +13,12 @@ import { asyncWrapper } from '../shared/AsyncWrapper';
 export class GithubController {
     @Post('')
     @Middleware(GithubMiddleware)
-    private async githubWebhook(req: Request, res: Response) {
-        await Extraction.extractFromPayload(req.body as GithubWebhookPushPayload);
-        res.status(OK);
+    private githubWebhook(req: Request, res: Response) {
+        res.status(OK).end();
+        try {
+            Extraction.extractFromPayload(req.body as GithubWebhookPushPayload);
+        } catch (e) {
+            logger.error(e);
+        }
     }
 }
