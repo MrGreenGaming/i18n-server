@@ -1,0 +1,13 @@
+version: '3.6'
+services:
+  i18n-server-development:
+    build:
+      context: .
+      target: development
+    command: ["npm", "run", "debug"]
+    container_name: i18n-server-development
+    ports:
+      - '3000:3000'
+      - '9229:9229'
+    volumes:
+      - './:/var/build/:delegated'

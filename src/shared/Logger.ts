@@ -22,12 +22,12 @@ const logger = createLogger({
 if (process.env.NODE_ENV === 'production') {
     const fileFormat = format.combine(format.timestamp(), format.json());
     const errTransport = new File({
-        filename: './logs/error.log',
+        filename: `${process.cwd}/logs/error.log`,
         format: fileFormat,
         level: 'error',
     });
     const infoTransport = new File({
-        filename: './logs/combined.log',
+        filename: `${process.cwd}/logs/combined.log`,
         format: fileFormat,
     });
     logger.add(errTransport);

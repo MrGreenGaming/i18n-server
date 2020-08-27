@@ -1,0 +1,10 @@
+version: '3.6'
+services:
+  i18n-server:
+    build:
+      context: .
+      target: production
+    command: ["npm", "run", "prod"]
+    container_name: i18n-server
+    ports:
+      - '7002:3000'
