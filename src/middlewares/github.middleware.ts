@@ -22,8 +22,9 @@ export default async function GithubMiddleware(req: Request, res: Response, next
         }
         const signature = req.headers['x-hub-signature'] as string;
         const validSignature = isValidSignature(signature, payload);
-        if (validSignature) {
+        if (!validSignature) {
             res.status(UNAUTHORIZED).json({ error: 'Invalid signature' }).end();
+            return;
         }
         // OK for ping event
         if (req.headers['x-github-event'] == 'ping') {
