@@ -36,13 +36,22 @@ export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownl
             relative: `./extraction/${this.identifier}`,
             absolute: `${this.tempPath}/${this.identifier}`,
         };
+        await this.moveUnzipToRoot(`${this.path.absolute}/${folderName}`, this.path.absolute);
+
         return Promise.resolve(this.path);
     }
 
-    async remove(): Promise<void> {
+    public async remove(): Promise<void> {
         if (this.path && (await fs.pathExists(this.path.absolute))) {
-            logger.info(`Removing extraction repo '${this.path}'`);
+            logger.info(`Removing extraction repo '${this.path.absolute}'`);
             await fs.remove(this.path.absolute);
+        }
+    }
+
+    private async moveUnzipToRoot(fromPath: string, toPath: string) {
+        // Move files from unzipped folder to this.path.absolute
+        for (const entry of await fs.readdir(fromPath)) {
+            await fs.move(`${fromPath}/${entry}`, `${toPath}/${entry}`);
         }
     }
 
