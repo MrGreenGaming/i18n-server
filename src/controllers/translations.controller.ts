@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
-import { Controller, Middleware, Get } from '@overnightjs/core';
+import { Controller, Middleware, Get, ClassErrorMiddleware, ClassWrapper } from '@overnightjs/core';
 import ComponentMiddleware from '../middlewares/component.middleware';
 import ProjectMiddleware from '../middlewares/project.middleware';
 import { Translations, IProject, IComponent } from '../managers';
 import { OK } from 'http-status-codes';
+import errorMiddleware from '../middlewares/error.middleware';
+import { asyncWrapper } from '../shared/AsyncWrapper';
 
 @Controller('')
+@ClassWrapper(asyncWrapper)
+@ClassErrorMiddleware(errorMiddleware)
 export class TranslationsController {
     @Get('')
     private getAllProjects(req: Request, res: Response) {

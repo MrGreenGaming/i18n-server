@@ -36,8 +36,10 @@ if (result2.error) {
 function envValidation() {
     const schema = Joi.object({
         NODE_ENV: Joi.string().valid('development', 'production').required(),
-        PORT: Joi.number().default(3000),
-        HOST: Joi.string().default('localhost'),
+        GH_WEBHOOK_SECRET: Joi.string().required(),
+        GH_PERSONAL_ACCESS_TOKEN: Joi.string().required(),
+        GH_USERNAME: Joi.string().required(),
+        GH_EMAIL: Joi.string().required(),
     }).options({ stripUnknown: true });
 
     const validationResult: Joi.ValidationResult = schema.validate(Object.assign({}, process.env));
