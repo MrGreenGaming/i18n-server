@@ -4,6 +4,7 @@ import { IncomingMessage } from 'http';
 import axios, { AxiosResponse } from 'axios';
 import fs from 'fs-extra';
 import * as crypto from 'crypto';
+import logger from '../../shared/Logger';
 
 export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownloaderModel {
     public readonly repo: ExtractionRepositoryModel;
@@ -40,7 +41,7 @@ export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownl
 
     async remove(): Promise<void> {
         if (this.path && (await fs.pathExists(this.path.absolute))) {
-            console.log('removing');
+            logger.info(`Removing extraction repo '${this.path}'`);
             await fs.remove(this.path.absolute);
         }
     }
