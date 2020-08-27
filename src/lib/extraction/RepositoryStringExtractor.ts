@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import xmlParser from 'xml2json';
 import shell from 'shelljs';
 import * as crypto from 'crypto';
+import logger from '../../shared/Logger';
 
 export class RepositoryStringExtractor implements RepositoryStringExtractorModel {
     private repoPath?: DownloadedExtractionRepositoryPath;
@@ -43,7 +44,7 @@ export class RepositoryStringExtractor implements RepositoryStringExtractorModel
             // Map array to xgettext file arg string
             const tmpFile = this.generateUniqueString();
             const filesList = component.scripts.map((v) => `.${v.split(repoPath.absolute)[1]}`).join(' ');
-
+            logger.info(`xgettext: extracting ${component.path}`);
             const cmd = `echo ${filesList} | xargs xgettext --output='${repoPath.absolute}/${tmpFile}' --from-code=UTF-8 --add-comments='translators:' --directory='${this.repoPath.absolute}/' --omit-header ${this.keywords}`;
             shell.cd(repoPath.absolute);
             const componentPotString = shell.exec(cmd);
