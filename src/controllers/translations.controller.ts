@@ -13,6 +13,14 @@ import SecretKeyMiddleware from '../middlewares/secretkey.middleware';
 @ClassWrapper(asyncWrapper)
 @ClassErrorMiddleware(errorMiddleware)
 export class TranslationsController {
+    @Post('extract')
+    @Middleware([SecretKeyMiddleware, ExtractMiddleware])
+    private async extractRepo(req: ExtractRequest, res: Response) {
+        const repo = Extraction.getExtractionRepository(req.repoOwner as string, req.repoName as string);
+        await Extraction.extractAndPush(repo);
+        res.status(OK).json({ message: `${req.repoOwner}/${req.repoName} has been extracted!` });
+    }
+
     @Get('')
     private getAllProjects(req: Request, res: Response) {
         res.status(OK).json(Translations.getAllProjects());
@@ -39,12 +47,5 @@ export class TranslationsController {
         const component: IComponent = res.locals.component;
         const translations = await Translations.getComponentTranslations(project.name, component.name);
         res.status(OK).json(translations);
-    }
-    @Post('extract')
-    @Middleware([SecretKeyMiddleware, ExtractMiddleware])
-    private async extractRepo(req: ExtractRequest, res: Response) {
-        const repo = Extraction.getExtractionRepository(req.repoOwner as string, req.repoName as string);
-        await Extraction.extractAndPush(repo);
-        res.status(OK).json({ message: `${req.repoOwner}/${req.repoName} has been extracted!` });
     }
 }
