@@ -26,6 +26,22 @@ You can overwrite docker-compose values using the standard docker-compose overri
 
 ## API Paths
 
+### POST /extract
+
+**Extract a repo specified in extractionsConfig.json**
+*Required body*
+
+```json
+{
+   "name": "repoName",
+   "owner": "repoOwner",
+   "secret": "secretKey"
+}
+```
+
+- Secret key
+  - Webhook secret as specified in .env
+
 ### GET /:project/
 
 **Get project information**

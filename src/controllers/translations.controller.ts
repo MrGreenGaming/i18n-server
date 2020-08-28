@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
-import { Controller, Middleware, Get, ClassErrorMiddleware, ClassWrapper } from '@overnightjs/core';
+import { Controller, Middleware, Get, ClassErrorMiddleware, ClassWrapper, Post } from '@overnightjs/core';
 import ComponentMiddleware from '../middlewares/component.middleware';
 import ProjectMiddleware from '../middlewares/project.middleware';
-import { Translations, IProject, IComponent } from '../managers';
+import { Translations, IProject, IComponent, Extraction } from '../managers';
 import { OK } from 'http-status-codes';
 import errorMiddleware from '../middlewares/error.middleware';
 import { asyncWrapper } from '../shared/AsyncWrapper';
+import ExtractMiddleware, { ExtractRequest } from '../middlewares/extract.middleware';
+import SecretKeyMiddleware from '../middlewares/secretkey.middleware';
 
 @Controller('')
 @ClassWrapper(asyncWrapper)
@@ -37,5 +39,12 @@ export class TranslationsController {
         const component: IComponent = res.locals.component;
         const translations = await Translations.getComponentTranslations(project.name, component.name);
         res.status(OK).json(translations);
+    }
+    @Post('extract')
+    @Middleware([SecretKeyMiddleware, ExtractMiddleware])
+    private async extractRepo(req: ExtractRequest, res: Response) {
+        const repo = Extraction.getExtractionRepository(req.repoOwner as string, req.repoName as string);
+        await Extraction.extractAndPush(repo);
+        res.status(OK).json({ message: `${req.repoOwner}/${req.repoName} has been extracted!` });
     }
 }

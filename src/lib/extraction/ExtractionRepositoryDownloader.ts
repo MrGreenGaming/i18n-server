@@ -11,6 +11,7 @@ export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownl
     public path?: DownloadedExtractionRepositoryPath;
     private identifier: string;
     private tempPath = `${process.cwd()}/files/extraction`;
+    private isDownloaded = false;
 
     constructor(repo: ExtractionRepositoryModel) {
         this.identifier = this.generateUniqueString();
@@ -18,6 +19,9 @@ export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownl
     }
 
     public async download(): Promise<DownloadedExtractionRepositoryPath> {
+        if (this.isDownloaded) throw new Error('Repository is already being extracted');
+        logger.info(`Downloading repo: ${this.repo.owner}/${this.repo.name}/zipball/${this.repo.branch}`);
+        this.isDownloaded = true;
         await fs.ensureDir(this.tempPath);
         const repoDownload: AxiosResponse<IncomingMessage> = await axios({
             method: 'get',
@@ -38,7 +42,7 @@ export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownl
         };
         await this.moveUnzipToRoot(`${this.path.absolute}/${folderName}`, this.path.absolute);
 
-        return Promise.resolve(this.path);
+        return this.path;
     }
 
     public async remove(): Promise<void> {
@@ -46,6 +50,7 @@ export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownl
             logger.info(`Removing extraction repo '${this.path.absolute}'`);
             await fs.remove(this.path.absolute);
         }
+        this.isDownloaded = false;
         this.identifier = this.generateUniqueString();
     }
 
