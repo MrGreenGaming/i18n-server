@@ -9,7 +9,7 @@ import { asyncWrapper } from '../shared/AsyncWrapper';
 import ExtractMiddleware, { ExtractRequest } from '../middlewares/extract.middleware';
 import SecretKeyMiddleware from '../middlewares/secretkey.middleware';
 
-@Controller('')
+@Controller('translations')
 @ClassWrapper(asyncWrapper)
 @ClassErrorMiddleware(errorMiddleware)
 export class TranslationsController {
@@ -40,12 +40,22 @@ export class TranslationsController {
         res.status(OK).json(component);
     }
 
-    @Get(':project/:component/translations')
+    @Get(':project/:component/:language')
     @Middleware([ProjectMiddleware, ComponentMiddleware])
     private async getComponentTranslations(req: Request, res: Response) {
         const project: IProject = res.locals.project;
         const component: IComponent = res.locals.component;
-        const translations = await Translations.getComponentTranslations(project.name, component.name);
-        res.status(OK).json(translations);
+        const language = req.params.language as string;
+        if (language === 'all') {
+            const translation = await Translations.getComponentTranslations(project.name, component.name);
+            res.status(OK).json(translation);
+        } else {
+            const translation = await Translations.getComponentTranslationsLanguage(
+                project.name,
+                component.name,
+                language,
+            );
+            res.status(OK).json(translation);
+        }
     }
 }

@@ -70,6 +70,39 @@ class TranslationsManager extends BaseManager {
         return translations;
     }
 
+    public async getComponentTranslationsLanguage(projectName: string, componentName: string, language: string) {
+        language = language.toLocaleLowerCase();
+        // Check if language is present
+        const languageFiles = this.getComponentLanguages(projectName, componentName);
+        let langFile;
+        for (const lang of languageFiles) {
+            if (lang.name === language) {
+                langFile = lang;
+                break;
+            }
+        }
+        if (!langFile) throw new Error(`Language ${language} does not exist in ${projectName}/${componentName}`);
+
+        // Check cache
+        if (this.translationCache.has(`${projectName}-${componentName}-${language}`)) {
+            return this.translationCache.get(`${projectName}-${componentName}-${language}`) as ITranslation;
+        }
+
+        let translation: ITranslation = {};
+        try {
+            const json: ITranslation = await jsonfile.readFile(
+                `${this.jsonPath}/${projectName}/${componentName}/${langFile.file}`,
+            );
+            translation = json;
+        } catch (e) {
+            logger.error(e);
+            throw e;
+        }
+        // Set cache
+        this.translationCache.set(`${projectName}-${componentName}-${language}`, translation);
+        return translation;
+    }
+
     public getProject(projectName: string) {
         const project = [...this.projects].find((v) => v.name === projectName);
         if (!project) throw `Project ${projectName} does not exist.`;

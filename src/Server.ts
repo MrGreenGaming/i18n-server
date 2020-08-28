@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import express from 'express';
-import { NOT_FOUND } from 'http-status-codes';
+import { NOT_FOUND, OK } from 'http-status-codes';
 
 class WebServer extends Server {
     private readonly SERVER_STARTED = 'Server started on port: ';
@@ -46,6 +46,14 @@ class WebServer extends Server {
     }
 
     public start(port: number): void {
+        // Root
+        this.app.get('/', function (req, res) {
+            res.status(OK).json({
+                date: new Date(),
+                message: `For more information, visit https://github.com/MrGreenGaming/i18n-server`,
+            });
+        });
+        // 404
         this.app.get('*', (req, res) => {
             res.status(NOT_FOUND).end();
         });
