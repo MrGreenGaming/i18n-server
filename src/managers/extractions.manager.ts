@@ -40,7 +40,7 @@ class ExtractionsManager extends BaseManager {
 
     public async extractFromPayload(payload: GithubWebhookPushPayload): Promise<void> {
         const repo = this.getExtractionRepository(payload.repository.owner.name, payload.repository.name);
-        logger.log(`Extracting for ${repo.owner}/${repo.name}#${repo.branch}`, {});
+        logger.info(`Extracting for ${repo.owner}/${repo.name}#${repo.branch}`, {});
         await this.extractAndPush(repo);
     }
 }

@@ -1,6 +1,7 @@
 import { IExtractedPots } from '../extraction/RepositoryStringExtractor';
 import simpleGit, { SimpleGit, ResetMode, CleanOptions } from 'simple-git';
 import fs, { outputFile } from 'fs-extra';
+import logger from '../../shared/Logger';
 
 class RepositoryClass implements RepositoryModel {
     public readonly path = `${process.cwd()}/files/i18nrepo`;
@@ -51,6 +52,7 @@ class RepositoryClass implements RepositoryModel {
     }
 
     private async push(): Promise<void> {
+        logger.info(`Pushing ${process.env.REPO} ...`);
         await this.git.addConfig('user.name', process.env.GH_USERNAME as string);
         await this.git.addConfig('user.password', process.env.GH_PERSONAL_ACCESS_TOKEN as string);
         await this.git.addConfig('user.email', process.env.GH_EMAIL as string);
