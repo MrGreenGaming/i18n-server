@@ -9,7 +9,7 @@ import logger from '../../shared/Logger';
 export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownloaderModel {
     public readonly repo: ExtractionRepositoryModel;
     public path?: DownloadedExtractionRepositoryPath;
-    public readonly identifier: string;
+    private identifier: string;
     private tempPath = `${process.cwd()}/files/extraction`;
 
     constructor(repo: ExtractionRepositoryModel) {
@@ -46,6 +46,7 @@ export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownl
             logger.info(`Removing extraction repo '${this.path.absolute}'`);
             await fs.remove(this.path.absolute);
         }
+        this.identifier = this.generateUniqueString();
     }
 
     private async moveUnzipToRoot(fromPath: string, toPath: string) {
@@ -81,7 +82,6 @@ export class ExtractionRepositoryDownloader implements ExtractionRepositoryDownl
 export interface ExtractionRepositoryDownloaderModel {
     repo: ExtractionRepositoryModel;
     path?: DownloadedExtractionRepositoryPath;
-    identifier: string;
     download(): Promise<DownloadedExtractionRepositoryPath>;
     remove(): Promise<void>;
 }
