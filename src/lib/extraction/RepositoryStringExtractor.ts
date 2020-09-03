@@ -10,7 +10,7 @@ export class RepositoryStringExtractor implements RepositoryStringExtractorModel
     readonly keywords = [
         "--keyword='_'",
         "--keyword='_.register'",
-        "--keyword='_.For'",
+        "--keyword='_.For:2'",
         "--keyword='_.many:1,2'",
         "--keyword='_.For.many:2,3'",
         "--keyword='_.context:1c,2'",
@@ -32,11 +32,11 @@ export class RepositoryStringExtractor implements RepositoryStringExtractorModel
         await this.cleanup();
         this.repoPath = repoPath;
         const components = await this.getComponents(this.repoPath.absolute);
-        const PotFiles = this.extractXgettext(components);
+        const PotFiles = await this.extractXgettext(components);
         return PotFiles;
     }
 
-    private extractXgettext(components: IExtractedComponent[]): IExtractedPots[] {
+    private async extractXgettext(components: IExtractedComponent[]): Promise<IExtractedPots[]> {
         if (!this.repoPath) throw 'repoPath undefined';
         const repoPath = this.repoPath;
         const extracted: IExtractedPots[] = [];
@@ -49,16 +49,31 @@ export class RepositoryStringExtractor implements RepositoryStringExtractorModel
             shell.cd(repoPath.absolute);
             const componentPotString = shell.exec(cmd);
 
-            if (componentPotString.code === 0 && fs.existsSync(`${repoPath.absolute}/${tmpFile}`)) {
-                extracted.push({
-                    component: component.component,
-                    project: component.project,
-                    content: fs.readFileSync(`${repoPath.absolute}/${tmpFile}`).toString(),
-                });
+            if (componentPotString.code === 0) {
+                let readFile: string;
+                try {
+                    readFile = (await fs.readFile(`${repoPath.absolute}/${tmpFile}`)).toString();
+                    const xgettextResult: IExtractedPots = {
+                        component: component.component,
+                        project: component.project,
+                        content: readFile,
+                    };
+                    extracted.push(xgettextResult);
+                    logger.info(
+                        `xgettext extracted ${component.project}/${component.component}, length: ${xgettextResult.content.length}`,
+                    );
+                } catch (e) {
+                    logger.error(e);
+                }
+            } else {
+                logger.error(`Could not extract ${component.path}`);
             }
+
             // Remove extracted file if exist
-            if (fs.existsSync(`${repoPath.absolute}/${tmpFile}`)) {
-                fs.removeSync(`${repoPath.absolute}/${tmpFile}`);
+            try {
+                await fs.remove(`${repoPath.absolute}/${tmpFile}`);
+            } catch (e) {
+                logger.error(e);
             }
         }
         return extracted;
