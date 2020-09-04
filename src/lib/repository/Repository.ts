@@ -33,11 +33,13 @@ class RepositoryClass implements RepositoryModel {
     public async pushTranslationComponents(components: IExtractedPots[]): Promise<void> {
         if (!this.isInitiated) await this.initiate();
         let error;
+        const filesToPush: string[] = [];
         try {
             this.isPushingComponents = true;
             for (const component of components) {
                 const path = `${this.path}/${component.project}/${component.component}/messages.pot`;
                 await outputFile(path, component.content);
+                filesToPush.push(path);
             }
 
             this.isPushingComponents = false;
@@ -47,16 +49,19 @@ class RepositoryClass implements RepositoryModel {
             this.isPushingComponents = false;
         }
         if (error) throw error;
-
-        await this.push();
+        if (filesToPush.length > 0) {
+            await this.push(filesToPush);
+        }
     }
 
-    private async push(): Promise<void> {
+    private async push(filesToPush: string[]): Promise<void> {
         logger.info(`Pushing ${process.env.REPO} ...`);
         await this.git.addConfig('user.name', process.env.GH_USERNAME as string);
         await this.git.addConfig('user.password', process.env.GH_PERSONAL_ACCESS_TOKEN as string);
         await this.git.addConfig('user.email', process.env.GH_EMAIL as string);
-        await this.git.add('*');
+        for (const path of filesToPush) {
+            await this.git.add(path);
+        }
         await this.git.commit('Update base translation file(s) from extracted source strings');
         await this.git.push();
     }
